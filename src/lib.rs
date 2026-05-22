@@ -1,22 +1,15 @@
 pub fn search<'a>(query: &str, content: &'a str) -> Vec<&'a str> {
-    let mut results = Vec::new();
-    for line in content.lines() {
-        if line.contains(query) {
-            results.push(line);
-        }
-    }
-    results
+    content
+        .lines() // make an new iterator that generates new content without spaces
+        .filter(|line| line.contains(query)) // filtering basedon line that containing query
+        .collect() // turn into collection
 }
 
 pub fn search_case_sensitive<'a>(query: &str, content: &'a str) -> Vec<&'a str> {
-    let query = query.to_lowercase(); // from &str into String type
-    let mut results = Vec::new();
-    for line in content.lines() {
-        if line.to_lowercase().contains(&query) {
-            results.push(line);
-        }
-    }
-    results
+    content
+        .lines() // make an new iterator that generates new content without spaces
+        .filter(|line| line.to_lowercase().contains(&query.to_lowercase())) // filtering basedon line that containing query
+        .collect() // turn into collection
 }
 #[cfg(test)]
 mod test {

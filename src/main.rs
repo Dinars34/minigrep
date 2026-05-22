@@ -9,9 +9,7 @@ use std::process;
 
 // Program Task: Searching file and find the line in file that contain string user wants
 fn main() {
-    let args: Vec<String> = env::args().collect(); // the argument of the program // command line parsing logic
-    // trying to run command cargo run -- needle haystack and you will get vector of  ["target/debug/minigrep", "needle", "haystack",]
-    let config = Config::build(&args).unwrap_or_else(|err| {
+    let config = Config::build(env::args()).unwrap_or_else(|err| {
         eprintln!("Problem parsing arguments: {err}"); // prints any error to standard error instead standard output
         process::exit(1);
     });
@@ -30,17 +28,24 @@ struct Config {
 
 impl Config {
     // make an associated function
-    fn build(args: &[String]) -> Result<Config, &'static str> {
-        if args.len() < 3 {
-            return Err("Not enough arguments");
-        }
+    fn build(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
+        args.next(); // skiping first element
 
-        let ignore_case = env::var("IGNORE_CASE").is_ok(); // is_ok method will check wheter the IGNORE_CASE environment variable is set or not
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a query string"),
+        };
 
+        let file_path = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a query string"),
+        };
+
+        let ignore_case = env::var("IGNORE_CASE").is_ok();
         Ok(Config {
-            query: args[1].clone(),
-            file_path: args[2].clone(),
-            ignore_case: ignore_case,
+            query,
+            file_path,
+            ignore_case,
         })
     }
 }
